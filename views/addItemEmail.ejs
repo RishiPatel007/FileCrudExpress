@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Item Added</title>
+		<style>
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+			}
+			.container {
+				padding: 30px;
+				text-align: center;
+				background: white;
+			}
+			h1 {
+				color: green;
+				margin-bottom: 20px;
+			}
+			h2 {
+				color: green;
+				margin: 10px 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Item Added</h1>
+			<h2>Name: <%= item.sName %></h2>
+			<h2>Quantity: <%= item.nQuantity %></h2>
+			<h2>Price: ₹<%= item.nPrice %></h2>
+		</div>
+	</body>
+</html>
