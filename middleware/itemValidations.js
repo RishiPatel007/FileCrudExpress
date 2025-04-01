@@ -1,97 +1,58 @@
-const { validate, version } = require("uuid");
-const { ApiError, validateFields } = require("../utils");
-const httpStatus = require("http-status").status;
+const { body, param } = require("express-validator");
 
-function getItems(req, res, next) {
-	return next();
+function getOrDeleteItemById() {
+	return [param("id").isUUID(4).withMessage("Invalid uuid Id")];
 }
 
-function getItemById(req, res, next) {
-	const iId = req.params.id;
-	if (!validate(iId) || version(iId) !== 4) {
-		throw new ApiError("Invalid uuid Id", httpStatus.BAD_REQUEST);
+function createOrUpdateItem(nFields) {
+	const aValidationArray = [
+		body()
+			.custom((value) => {
+				if (Object.keys(value).length === 0) {
+					throw new Error("Body Required");
+				}
+				return true;
+			})
+			.isObject()
+			.withMessage("Body must be an Object")
+			.custom((value) => {
+				if (Object.keys(value).length > nFields) {
+					throw new Error("Extra Fields");
+				}
+				return true;
+			}),
+		body("sName")
+			.notEmpty()
+			.withMessage("sName required")
+			.isAlphanumeric()
+			.withMessage("sName must be AlphaNumeric"),
+		body("nPrice")
+			.notEmpty()
+			.withMessage("nPrice required")
+			.isNumeric()
+			.withMessage("nPrice must be Numeric"),
+		body("nQuantity")
+			.notEmpty()
+			.withMessage("nQuantity required")
+			.isNumeric()
+			.withMessage("nQuantity must be Numeric"),
+	];
+	if (nFields === 4) {
+		aValidationArray.unshift(
+			param("id").isUUID(4).withMessage("Invalid uuid Id")
+		);
+		aValidationArray.push(
+			body("sStatus")
+				.notEmpty()
+				.withMessage("sStatus required")
+				.isIn(["active", "inactive"])
+				.withMessage("sStatus must be active or inactive")
+		);
 	}
-
-	return next();
+	return aValidationArray;
 }
 
-function createItem(req, res, next) {
-	const oItemData = req.body;
-	if (
-		!Object.hasOwn(oItemData, "sName") ||
-		!Object.hasOwn(oItemData, "nQuantity") ||
-		!Object.hasOwn(oItemData, "nPrice")
-	) {
-		throw new ApiError(
-			"Invalid Item Data (Missing Fields)",
-			httpStatus.BAD_REQUEST
-		);
-	}
-
-	if (Object.keys(oItemData).length > 3) {
-		throw new ApiError(
-			"Invalid Item Data (Extra Fields)",
-			httpStatus.BAD_REQUEST
-		);
-	}
-
-	if (!validateFields(oItemData)) {
-		throw new ApiError(
-			"Invalid Item Data (Wrong Data Types / Values)",
-			httpStatus.BAD_REQUEST
-		);
-	}
-
-	oItemData.nQuantity = +oItemData.nQuantity;
-	oItemData.nPrice = +oItemData.nPrice;
-
-	return next();
-}
-
-function updateItem(req, res, next) {
-	const iId = req.params.id;
-	if (!validate(iId) || version(iId) !== 4) {
-		throw new ApiError("Invalid uuid Id", httpStatus.BAD_REQUEST);
-	}
-
-	const oItemData = req.body;
-	if (
-		!Object.hasOwn(oItemData, "sName") ||
-		!Object.hasOwn(oItemData, "nQuantity") ||
-		!Object.hasOwn(oItemData, "nPrice") ||
-		!Object.hasOwn(oItemData, "sStatus")
-	) {
-		throw new ApiError(
-			"Invalid Item Data (Missing Fields)",
-			httpStatus.BAD_REQUEST
-		);
-	}
-
-	if (Object.keys(oItemData).length > 4) {
-		throw new ApiError(
-			"Invalid Item Data (Extra Fields)",
-			httpStatus.BAD_REQUEST
-		);
-	}
-
-	if (!validateFields(oItemData)) {
-		throw new ApiError(
-			"Invalid Item Data (Wrong Data Types / Values)",
-			httpStatus.BAD_REQUEST
-		);
-	}
-
-	oItemData.nQuantity = +oItemData.nQuantity;
-	oItemData.nPrice = +oItemData.nPrice;
-	return next();
-}
-
-function deleteItem(req, res, next) {
-	const iId = req.params.id;
-	if (!validate(iId) || version(iId) !== 4) {
-		throw new ApiError("Invalid uuid Id", httpStatus.BAD_REQUEST);
-	}
-	return next();
-}
-
-module.exports = { getItems, getItemById, createItem, updateItem, deleteItem };
+module.exports = {
+	getOrDeleteItemById,
+	createOrUpdateItem,
+};

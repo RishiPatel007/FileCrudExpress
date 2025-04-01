@@ -1,6 +1,7 @@
 const httpStatus = require("http-status").status;
 const moment = require("moment");
 const path = require("path");
+
 const {
 	readItemsFromFile,
 	sendResponse,
@@ -38,7 +39,11 @@ function getItemById(req, res) {
 
 function createItem(req, res) {
 	const { sendMail } = require("../services/emailService");
+
 	const oItemData = req.body;
+	oItemData.nQuantity = +oItemData.nQuantity;
+	oItemData.nPrice = +oItemData.nPrice;
+
 	let aData = readItemsFromFile();
 	if (aData.find((oItem) => oItem.sName === oItemData.sName)) {
 		throw new ApiError(
@@ -88,12 +93,15 @@ function createItem(req, res) {
 function updateItem(req, res) {
 	const iId = req.params.id;
 	const oItemData = req.body;
+	oItemData.nQuantity = +oItemData.nQuantity;
+	oItemData.nPrice = +oItemData.nPrice;
+
 	const aData = readItemsFromFile();
 
 	if (
-		aData.find((oItem) => {
-			return oItem.sName === oItemData.sName && oItem.iId !== iId;
-		})
+		aData.find(
+			(oItem) => oItem.sName === oItemData.sName && oItem.iId !== iId
+		)
 	) {
 		throw new ApiError(
 			"Other Item with this name already exist",
@@ -109,11 +117,9 @@ function updateItem(req, res) {
 		);
 	}
 
-	oOldItemData.sName = oItemData.sName;
-	oOldItemData.nQuantity = oItemData.nQuantity;
-	oOldItemData.nPrice = oItemData.nPrice;
-	oOldItemData.sStatus = oItemData.sStatus;
-	oOldItemData.dUpdatedAt = moment().format("Do MMMM YYYY : hh:mm:ss A");
+	Object.assign(oOldItemData, oItemData, {
+		dUpdatedAt: moment().format("Do MMMM YYYY : hh:mm:ss A"),
+	});
 
 	writeItemIntoFile({ aData })
 		.then(() => {

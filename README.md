@@ -22,6 +22,12 @@ nodemailer_password=<your-email-password>
 nodemailer_sendTo = <emails-of-other> (In a string seperated by comma)
 ```
 
+4. Run
+
+```bash
+npm start
+```
+
 `Leave nodemailer credentials blank if you don't want to send email on addItem (App will not crash)(probably)`
 
 ## API Endpoints

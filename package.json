@@ -12,6 +12,7 @@
 		"dotenv": "^16.4.7",
 		"ejs": "~2.6.1",
 		"express": "~4.16.1",
+		"express-validator": "^7.2.1",
 		"http-errors": "~1.6.3",
 		"http-status": "^2.1.0",
 		"moments": "^0.0.2",

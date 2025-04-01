@@ -1,13 +1,34 @@
 const { Router } = require("express");
 const itemController = require("../../controller/itemController");
 const itemValidations = require("../../middleware/itemValidations");
+const validationFailHandler = require("../../middleware/validationFailHandler");
 
 const router = Router();
 
-router.get("/", itemValidations.getItems, itemController.getItems);
-router.get("/:id", itemValidations.getItemById, itemController.getItemById);
-router.post("/", itemValidations.createItem, itemController.createItem);
-router.put("/:id", itemValidations.updateItem, itemController.updateItem);
-router.delete("/:id", itemValidations.deleteItem, itemController.deleteItem);
+router.get("/", itemController.getItems);
+router.get(
+	"/:id",
+	itemValidations.getOrDeleteItemById(),
+	validationFailHandler,
+	itemController.getItemById
+);
+router.post(
+	"/",
+	itemValidations.createOrUpdateItem(3),
+	validationFailHandler,
+	itemController.createItem
+);
+router.put(
+	"/:id",
+	itemValidations.createOrUpdateItem(4),
+	validationFailHandler,
+	itemController.updateItem
+);
+router.delete(
+	"/:id",
+	itemValidations.getOrDeleteItemById(),
+	validationFailHandler,
+	itemController.deleteItem
+);
 
 module.exports = router;
